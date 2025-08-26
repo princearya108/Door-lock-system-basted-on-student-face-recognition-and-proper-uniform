@@ -1,0 +1,34 @@
+[
+  {
+    "student_id": "ST2024001",
+    "name": "राहुल शर्मा",
+    "class": "10A",
+    "added_date": "2025-08-25T15:55:40.130172",
+    "active": true,
+    "roll_number": "ST2024001",
+    "course": "B.Tech",
+    "branch": "Computer Science",
+    "section": "A"
+  },
+  {
+    "student_id": "ST2024002",
+    "name": "प्रिया गुप्ता",
+    "class": "10B",
+    "added_date": "2025-08-25T15:55:40.130172",
+    "active": true,
+    "roll_number": "ST2024002",
+    "course": "B.Tech",
+    "branch": "Computer Science",
+    "section": "A"
+  },
+  {
+    "name": "prince kumar",
+    "course": "b.tech",
+    "branch": "cse",
+    "roll_number": "230101120270",
+    "section": "G",
+    "added_date": "2025-08-25T16:37:16.458083",
+    "active": true,
+    "image_path": "dataset\\faces\\230101120270_prince_kumar.jpg"
+  }
+]

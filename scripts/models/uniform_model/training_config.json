@@ -1,0 +1,12 @@
+{
+  "model": "yolov8n.pt",
+  "data": "uniform_dataset.yaml",
+  "epochs": 100,
+  "batch_size": 16,
+  "img_size": 640,
+  "device": "cpu",
+  "workers": 4,
+  "project": "uniform_training",
+  "name": "uniform_detector",
+  "save_period": 10
+}

@@ -1,0 +1,84 @@
+{
+  "total_images": 132,
+  "image_analysis": [
+    {
+      "filename": "IMG20240514173745.jpg",
+      "size": "1830x4080",
+      "aspect_ratio": 0.4485294117647059,
+      "file_size_kb": 2363,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "IMG20240514173841.jpg",
+      "size": "1830x4080",
+      "aspect_ratio": 0.4485294117647059,
+      "file_size_kb": 2717,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "IMG20240514173845.jpg",
+      "size": "1830x4080",
+      "aspect_ratio": 0.4485294117647059,
+      "file_size_kb": 2993,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "IMG20240514173845_01.jpg",
+      "size": "1830x4080",
+      "aspect_ratio": 0.4485294117647059,
+      "file_size_kb": 3000,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "IMG20240514173846.jpg",
+      "size": "1830x4080",
+      "aspect_ratio": 0.4485294117647059,
+      "file_size_kb": 3016,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "WhatsApp Image 2025-08-19 at 13.48.13_27ee60cd.jpg",
+      "size": "868x1156",
+      "aspect_ratio": 0.7508650519031141,
+      "file_size_kb": 243,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "WhatsApp Image 2025-08-19 at 13.48.14_4854fe4d.jpg",
+      "size": "868x1156",
+      "aspect_ratio": 0.7508650519031141,
+      "file_size_kb": 242,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "WhatsApp Image 2025-08-19 at 13.48.14_e002b06f.jpg",
+      "size": "868x1156",
+      "aspect_ratio": 0.7508650519031141,
+      "file_size_kb": 182,
+      "dominant_color": "grey"
+    },
+    {
+      "filename": "WhatsApp Image 2025-08-19 at 13.48.15_953cf3f1.jpg",
+      "size": "868x1156",
+      "aspect_ratio": 0.7508650519031141,
+      "file_size_kb": 220,
+      "dominant_color": "brown"
+    },
+    {
+      "filename": "WhatsApp Image 2025-08-19 at 13.48.15_f303e819.jpg",
+      "size": "868x1156",
+      "aspect_ratio": 0.7508650519031141,
+      "file_size_kb": 174,
+      "dominant_color": "grey"
+    }
+  ],
+  "color_statistics": {},
+  "size_statistics": {},
+  "recommendations": [
+    {
+      "type": "color_diversity",
+      "message": "Different colors की uniform images add करें (white shirt, blue shirt, black trousers, etc.)",
+      "priority": "medium"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2025-08-25T16:01:12.194298",
+    "student_id": null,
+    "face_confidence": 0.0,
+    "uniform_compliant": false,
+    "access_granted": false,
+    "reason": "Student not recognized"
+  },
+  {
+    "timestamp": "2025-08-25T16:01:12.335435",
+    "student_id": null,
+    "face_confidence": 0.0,
+    "uniform_compliant": false,
+    "access_granted": false,
+    "reason": "Student not recognized"
+  },
+  {
+    "timestamp": "2025-08-25T16:03:50.521657",
+    "student_id": null,
+    "face_confidence": 0.0,
+    "uniform_compliant": false,
+    "access_granted": false,
+    "reason": "Student not recognized"
+  }
+]

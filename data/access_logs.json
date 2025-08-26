@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2025-08-25T20:15:44.207628",
+    "student_id": "UNKNOWN",
+    "student_name": "Unknown Person",
+    "access_granted": false,
+    "face_confidence": 0.0,
+    "uniform_compliance": 0.0,
+    "device_id": "PC_CAMERA",
+    "denial_reason": "Face not recognized"
+  },
+  {
+    "timestamp": "2025-08-25T20:17:05.063062",
+    "student_id": "UNKNOWN",
+    "student_name": "Unknown Person",
+    "access_granted": false,
+    "face_confidence": 0.402310663408741,
+    "uniform_compliance": 0.4,
+    "device_id": "PC_CAMERA",
+    "denial_reason": "Face not recognized"
+  },
+  {
+    "timestamp": "2025-08-25T20:18:09.347377",
+    "student_id": "UNKNOWN",
+    "student_name": "Unknown Person",
+    "access_granted": false,
+    "face_confidence": 0.0,
+    "uniform_compliance": 0.0,
+    "device_id": "PC_CAMERA",
+    "denial_reason": "Face not recognized"
+  },
+  {
+    "timestamp": "2025-08-26T13:51:05.533731",
+    "student_id": "UNKNOWN",
+    "student_name": "Unknown Person",
+    "access_granted": false,
+    "face_confidence": 0.0,
+    "uniform_compliance": 0.6000000000000001,
+    "device_id": "PC_CAMERA",
+    "denial_reason": "Face not recognized"
+  }
+]

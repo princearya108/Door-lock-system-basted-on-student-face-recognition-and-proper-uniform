@@ -1,0 +1,273 @@
+{
+  "rule_name": "Standard School Uniform Rules",
+  "version": "1.0",
+  "created_date": "2025-08-27T00:23:59.553158",
+  "required_items": [
+    "student_id_card",
+    "shirt",
+    "trousers",
+    "shoes",
+    "belt",
+    "socks"
+  ],
+  "optional_items": [
+    "tie",
+    "blazer",
+    "sweater",
+    "cap",
+    "badge"
+  ],
+  "color_rules": {
+    "student_id_card": {
+      "allowed_colors": [
+        "white",
+        "light_blue",
+        "cream"
+      ],
+      "background_colors": [
+        "blue",
+        "white",
+        "red"
+      ],
+      "text_colors": [
+        "black",
+        "dark_blue"
+      ],
+      "required": true,
+      "position": "visible_on_chest_or_pocket"
+    },
+    "shirt": {
+      "allowed_colors": [
+        "white",
+        "light_blue",
+        "cream"
+      ],
+      "pattern": [
+        "solid",
+        "thin_stripes"
+      ],
+      "sleeve_type": [
+        "full_sleeve",
+        "half_sleeve"
+      ],
+      "collar_type": [
+        "regular",
+        "mandarin"
+      ],
+      "required": true
+    },
+    "trousers": {
+      "allowed_colors": [
+        "black",
+        "dark_blue",
+        "dark_grey",
+        "khaki"
+      ],
+      "pattern": [
+        "solid"
+      ],
+      "fit_type": [
+        "regular",
+        "straight"
+      ],
+      "length": [
+        "full_length"
+      ],
+      "required": true
+    },
+    "shoes": {
+      "allowed_colors": [
+        "black",
+        "dark_brown"
+      ],
+      "type": [
+        "formal_shoes",
+        "school_shoes"
+      ],
+      "sole_color": [
+        "black",
+        "brown",
+        "white"
+      ],
+      "laces": [
+        "black",
+        "brown",
+        "white"
+      ],
+      "required": true
+    },
+    "belt": {
+      "allowed_colors": [
+        "black",
+        "dark_brown"
+      ],
+      "material": [
+        "leather",
+        "synthetic"
+      ],
+      "buckle_color": [
+        "silver",
+        "gold",
+        "black"
+      ],
+      "required": true
+    },
+    "socks": {
+      "allowed_colors": [
+        "white",
+        "black",
+        "dark_blue"
+      ],
+      "length": [
+        "ankle",
+        "crew",
+        "knee_high"
+      ],
+      "pattern": [
+        "solid"
+      ],
+      "required": true
+    },
+    "tie": {
+      "allowed_colors": [
+        "red",
+        "blue",
+        "green",
+        "maroon"
+      ],
+      "pattern": [
+        "solid",
+        "stripes",
+        "school_pattern"
+      ],
+      "width": [
+        "regular"
+      ],
+      "required": false
+    },
+    "blazer": {
+      "allowed_colors": [
+        "dark_blue",
+        "black",
+        "grey"
+      ],
+      "pattern": [
+        "solid"
+      ],
+      "buttons": [
+        "silver",
+        "gold",
+        "matching"
+      ],
+      "required": false
+    }
+  },
+  "seasonal_rules": {
+    "summer": {
+      "months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "shirt_sleeve": "half_sleeve",
+      "blazer_required": false,
+      "tie_required": false
+    },
+    "winter": {
+      "months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "shirt_sleeve": "full_sleeve",
+      "blazer_required": true,
+      "tie_required": true,
+      "sweater_allowed": true
+    }
+  },
+  "special_day_rules": {
+    "assembly_day": {
+      "days": [
+        "monday"
+      ],
+      "tie_required": true,
+      "blazer_required": true,
+      "shoes_polish": "high"
+    },
+    "sports_day": {
+      "shirt": "sports_shirt",
+      "trousers": "sports_shorts",
+      "shoes": "sports_shoes"
+    }
+  },
+  "detection_parameters": {
+    "confidence_threshold": 0.5,
+    "nms_threshold": 0.4,
+    "minimum_size": {
+      "student_id_card": 50,
+      "shirt": 100,
+      "trousers": 100,
+      "shoes": 80,
+      "face": 100
+    },
+    "color_tolerance": 0.15,
+    "compliance_scores": {
+      "excellent": 0.95,
+      "good": 0.8,
+      "acceptable": 0.6,
+      "poor": 0.4,
+      "unacceptable": 0.2
+    }
+  },
+  "violation_penalties": {
+    "missing_student_id": {
+      "penalty": "high",
+      "action": "deny_entry",
+      "message": "Student ID card नहीं दिख रहा है"
+    },
+    "wrong_shirt_color": {
+      "penalty": "medium",
+      "action": "warning",
+      "message": "Shirt का color correct नहीं है"
+    },
+    "missing_shoes": {
+      "penalty": "high",
+      "action": "deny_entry",
+      "message": "Proper shoes नहीं पहने हैं"
+    },
+    "wrong_trouser_color": {
+      "penalty": "medium",
+      "action": "warning",
+      "message": "Trouser का color correct नहीं है"
+    },
+    "missing_belt": {
+      "penalty": "low",
+      "action": "warning",
+      "message": "Belt नहीं पहनी है"
+    }
+  },
+  "class_specific_rules": {
+    "grade_1_to_5": {
+      "tie_required": false,
+      "belt_required": false,
+      "shoe_type": "velcro_shoes_allowed"
+    },
+    "grade_6_to_8": {
+      "tie_required": true,
+      "belt_required": true,
+      "shoe_type": "formal_shoes"
+    },
+    "grade_9_to_12": {
+      "tie_required": true,
+      "belt_required": true,
+      "blazer_required": true,
+      "shoe_type": "formal_shoes"
+    }
+  }
+}

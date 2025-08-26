@@ -1,0 +1,17 @@
+names:
+- student_id_card
+- shirt
+- trousers
+- shoes
+- belt
+- socks
+- tie
+- blazer
+- sweater
+- cap
+- badge
+nc: 11
+path: ../dataset
+test: uniforms/test
+train: uniforms/train
+val: uniforms/val

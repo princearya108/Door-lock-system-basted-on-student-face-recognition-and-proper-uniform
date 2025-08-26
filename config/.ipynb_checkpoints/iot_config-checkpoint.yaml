@@ -1,0 +1,162 @@
+# IoT Device Configuration for Door Lock System
+
+# Device Information
+device:
+  id: "door_lock_001"
+  name: "Main Entrance Door Lock"
+  location: "Building A - Main Entrance"
+  firmware_version: "1.0.0"
+
+# WiFi Configuration
+wifi:
+  ssid: "YOUR_WIFI_SSID"
+  password: "YOUR_WIFI_PASSWORD"
+  timeout: 10000  # Connection timeout in milliseconds
+  retry_attempts: 3
+
+# MQTT Configuration
+mqtt:
+  broker: "your-mqtt-broker.com"  # Replace with your MQTT broker
+  port: 1883
+  client_id: "door_lock_esp32"
+  username: ""  # Optional
+  password: ""  # Optional
+  
+  # Topic subscriptions
+  topics:
+    subscribe:
+      unlock_command: "door/unlock"
+      lock_command: "door/lock"
+      config_update: "door/config"
+    
+    publish:
+      status: "door/status"
+      heartbeat: "device/heartbeat"
+      sensor_data: "door/sensors"
+  
+  # MQTT Settings
+  keep_alive: 60
+  qos: 1
+  retain: false
+  clean_session: true
+
+# Hardware Pin Configuration
+hardware:
+  # Relay Control
+  relay_pin: 2
+  relay_active_state: "LOW"  # LOW or HIGH
+  
+  # Door Sensor
+  door_sensor_pin: 4
+  door_sensor_type: "magnetic"  # magnetic, infrared
+  
+  # Status LED
+  status_led_pin: 5
+  
+  # Buzzer/Alarm
+  buzzer_pin: 18
+  
+  # Push Button (manual override)
+  button_pin: 19
+  button_active_state: "LOW"
+
+# Lock Configuration
+lock:
+  type: "solenoid"  # solenoid, magnetic, servo
+  unlock_duration: 5000  # Duration to keep unlocked (milliseconds)
+  auto_lock: true
+  
+  # Safety features
+  force_lock_after: 30000  # Force lock after this time if door sensor fails
+  max_unlock_attempts: 3
+  lockout_duration: 300000  # 5 minutes lockout after max attempts
+
+# Sensor Configuration
+sensors:
+  door_position:
+    enabled: true
+    debounce_time: 100  # milliseconds
+    
+  motion_detector:
+    enabled: false
+    pin: 21
+    sensitivity: 50
+    
+  temperature:
+    enabled: false
+    sensor_type: "DHT22"
+    pin: 22
+    read_interval: 60000  # 1 minute
+
+# Communication Settings
+communication:
+  heartbeat_interval: 30000  # Send heartbeat every 30 seconds
+  status_report_interval: 60000  # Send status every minute
+  connection_check_interval: 5000  # Check connection every 5 seconds
+  
+  # Retry settings
+  max_retries: 3
+  retry_delay: 1000  # milliseconds
+  
+# Power Management
+power:
+  deep_sleep_enabled: false
+  sleep_duration: 60000000  # 60 seconds in microseconds
+  wake_on_motion: true
+  low_power_mode: false
+
+# Security Settings
+security:
+  encryption_enabled: true
+  device_key: "your-device-secret-key"
+  certificate_path: "/spiffs/device_cert.pem"
+  
+  # Command validation
+  require_signature: false
+  allowed_commands:
+    - "unlock"
+    - "lock" 
+    - "status"
+    - "reset"
+
+# Debugging and Monitoring
+debug:
+  serial_enabled: true
+  serial_baud: 115200
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  
+  # Performance monitoring
+  memory_monitoring: true
+  cpu_monitoring: false
+  
+# OTA (Over-The-Air) Updates
+ota:
+  enabled: true
+  check_interval: 3600000  # Check for updates every hour
+  server_url: "https://your-update-server.com/ota"
+  current_version: "1.0.0"
+
+# Failsafe Configuration
+failsafe:
+  # Network failure handling
+  offline_mode: true
+  offline_unlock_codes:
+    - "EMERGENCY_001"
+    - "ADMIN_OVERRIDE"
+  
+  # Hardware failure handling
+  relay_failure_action: "lock"  # lock, unlock, maintain
+  sensor_failure_action: "alert"
+  
+  # Watchdog timer
+  watchdog_enabled: true
+  watchdog_timeout: 30000  # 30 seconds
+
+# Calibration and Testing
+calibration:
+  relay_test_duration: 1000  # Test relay for 1 second
+  sensor_test_cycles: 10
+  
+  # Factory reset conditions
+  factory_reset_button_hold: 10000  # Hold button for 10 seconds
+  factory_reset_mqtt_command: "FACTORY_RESET_CONFIRM"

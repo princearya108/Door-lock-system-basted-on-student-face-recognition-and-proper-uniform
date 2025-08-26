@@ -1,0 +1,11 @@
+student_id_card
+shirt
+trousers
+shoes
+belt
+socks
+tie
+blazer
+sweater
+cap
+badge
