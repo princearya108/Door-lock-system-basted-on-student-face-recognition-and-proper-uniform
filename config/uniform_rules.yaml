@@ -24,7 +24,7 @@ color_rules:
     material:
     - leather
     - synthetic
-    required: true
+    required: false
   blazer:
     allowed_colors:
     - dark_blue
@@ -60,7 +60,7 @@ color_rules:
     - black
     - brown
     - white
-    required: true
+    required: false
     sole_color:
     - black
     - brown
@@ -79,7 +79,7 @@ color_rules:
     - knee_high
     pattern:
     - solid
-    required: true
+    required: false
   student_id_card:
     allowed_colors:
     - white
@@ -120,8 +120,8 @@ color_rules:
     - full_length
     pattern:
     - solid
-    required: true
-created_date: '2025-08-27T00:23:59.553158'
+    required: false
+created_date: '2025-08-29T02:05:22.054333'
 detection_parameters:
   color_tolerance: 0.15
   compliance_scores:
@@ -139,6 +139,10 @@ detection_parameters:
     trousers: 100
   nms_threshold: 0.4
 optional_items:
+- trousers
+- shoes
+- belt
+- socks
 - tie
 - blazer
 - sweater
@@ -147,10 +151,6 @@ optional_items:
 required_items:
 - student_id_card
 - shirt
-- trousers
-- shoes
-- belt
-- socks
 rule_name: Standard School Uniform Rules
 seasonal_rules:
   summer:

@@ -1,0 +1,18 @@
+{
+  "current_environment": "school_college",
+  "available_environments": [
+    "school_college",
+    "hotel",
+    "office",
+    "hospital",
+    "factory"
+  ],
+  "environment_descriptions": {
+    "school_college": "Educational institution with uniform requirements",
+    "hotel": "Hotel with guest access control",
+    "office": "Corporate office with employee access",
+    "hospital": "Medical facility with staff and visitor access",
+    "factory": "Industrial facility with safety requirements"
+  },
+  "last_updated": "2025-08-29T02:06:40.932810"
+}

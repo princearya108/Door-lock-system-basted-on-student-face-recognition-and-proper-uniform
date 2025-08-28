@@ -1,0 +1,244 @@
+{
+  "school_college": {
+    "name": "School/College",
+    "description": "Educational institution with uniform requirements",
+    "features": {
+      "face_recognition": true,
+      "uniform_detection": true,
+      "access_control": true,
+      "student_management": true,
+      "analytics": true
+    },
+    "uniform_rules": {
+      "enabled": true,
+      "required_items": [
+        "student_id_card",
+        "shirt"
+      ],
+      "optional_items": [
+        "trousers",
+        "shoes",
+        "belt",
+        "socks",
+        "tie",
+        "blazer",
+        "sweater",
+        "cap",
+        "badge"
+      ],
+      "passing_score": 0.4,
+      "bonus_score": 0.6
+    },
+    "access_rules": {
+      "require_face_recognition": true,
+      "require_uniform_compliance": true,
+      "face_threshold": 0.6,
+      "uniform_threshold": 0.4
+    },
+    "user_types": [
+      "students",
+      "teachers",
+      "staff",
+      "visitors"
+    ],
+    "time_restrictions": {
+      "enabled": true,
+      "allowed_hours": "06:00-20:00",
+      "allowed_days": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday"
+      ]
+    }
+  },
+  "hotel": {
+    "name": "Hotel",
+    "description": "Hotel with guest access control",
+    "features": {
+      "face_recognition": true,
+      "uniform_detection": false,
+      "access_control": true,
+      "guest_management": true,
+      "analytics": true
+    },
+    "uniform_rules": {
+      "enabled": false,
+      "required_items": [],
+      "optional_items": [],
+      "passing_score": 0.0,
+      "bonus_score": 0.0
+    },
+    "access_rules": {
+      "require_face_recognition": true,
+      "require_uniform_compliance": false,
+      "face_threshold": 0.7,
+      "uniform_threshold": 0.0
+    },
+    "user_types": [
+      "guests",
+      "staff",
+      "management",
+      "visitors"
+    ],
+    "time_restrictions": {
+      "enabled": true,
+      "allowed_hours": "00:00-23:59",
+      "allowed_days": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+      ]
+    }
+  },
+  "office": {
+    "name": "Office",
+    "description": "Corporate office with employee access",
+    "features": {
+      "face_recognition": true,
+      "uniform_detection": false,
+      "access_control": true,
+      "employee_management": true,
+      "analytics": true
+    },
+    "uniform_rules": {
+      "enabled": false,
+      "required_items": [],
+      "optional_items": [],
+      "passing_score": 0.0,
+      "bonus_score": 0.0
+    },
+    "access_rules": {
+      "require_face_recognition": true,
+      "require_uniform_compliance": false,
+      "face_threshold": 0.65,
+      "uniform_threshold": 0.0
+    },
+    "user_types": [
+      "employees",
+      "contractors",
+      "visitors",
+      "management"
+    ],
+    "time_restrictions": {
+      "enabled": true,
+      "allowed_hours": "07:00-19:00",
+      "allowed_days": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday"
+      ]
+    }
+  },
+  "hospital": {
+    "name": "Hospital",
+    "description": "Medical facility with staff and visitor access",
+    "features": {
+      "face_recognition": true,
+      "uniform_detection": true,
+      "access_control": true,
+      "staff_management": true,
+      "analytics": true
+    },
+    "uniform_rules": {
+      "enabled": true,
+      "required_items": [
+        "staff_id",
+        "medical_uniform"
+      ],
+      "optional_items": [
+        "lab_coat",
+        "scrubs",
+        "shoes",
+        "cap"
+      ],
+      "passing_score": 0.5,
+      "bonus_score": 0.5
+    },
+    "access_rules": {
+      "require_face_recognition": true,
+      "require_uniform_compliance": true,
+      "face_threshold": 0.7,
+      "uniform_threshold": 0.5
+    },
+    "user_types": [
+      "doctors",
+      "nurses",
+      "staff",
+      "patients",
+      "visitors"
+    ],
+    "time_restrictions": {
+      "enabled": true,
+      "allowed_hours": "00:00-23:59",
+      "allowed_days": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+      ]
+    }
+  },
+  "factory": {
+    "name": "Factory/Manufacturing",
+    "description": "Industrial facility with safety requirements",
+    "features": {
+      "face_recognition": true,
+      "uniform_detection": true,
+      "access_control": true,
+      "worker_management": true,
+      "analytics": true
+    },
+    "uniform_rules": {
+      "enabled": true,
+      "required_items": [
+        "worker_id",
+        "safety_helmet",
+        "safety_shoes"
+      ],
+      "optional_items": [
+        "safety_vest",
+        "gloves",
+        "uniform",
+        "goggles"
+      ],
+      "passing_score": 0.6,
+      "bonus_score": 0.4
+    },
+    "access_rules": {
+      "require_face_recognition": true,
+      "require_uniform_compliance": true,
+      "face_threshold": 0.6,
+      "uniform_threshold": 0.6
+    },
+    "user_types": [
+      "workers",
+      "supervisors",
+      "engineers",
+      "visitors"
+    ],
+    "time_restrictions": {
+      "enabled": true,
+      "allowed_hours": "06:00-22:00",
+      "allowed_days": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday"
+      ]
+    }
+  }
+}

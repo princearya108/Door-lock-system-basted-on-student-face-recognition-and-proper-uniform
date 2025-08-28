@@ -23,6 +23,29 @@ import certifi
 from urllib.parse import quote_plus
 import time
 
+# Environment Configuration
+def load_environment_config():
+    """Load environment configuration"""
+    try:
+        with open('config/environment_config.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        # Default configuration if file not found
+        return {
+            "school_college": {
+                "name": "School/College",
+                "features": {"uniform_detection": True},
+                "uniform_rules": {"enabled": True, "required_items": ["student_id_card", "shirt"]},
+                "access_rules": {"require_uniform_compliance": True, "face_threshold": 0.6, "uniform_threshold": 0.4}
+            },
+            "hotel": {
+                "name": "Hotel",
+                "features": {"uniform_detection": False},
+                "uniform_rules": {"enabled": False},
+                "access_rules": {"require_uniform_compliance": False, "face_threshold": 0.7, "uniform_threshold": 0.0}
+            }
+        }
+
 # Page configuration
 st.set_page_config(
     page_title="Door Lock System - Admin Panel",
@@ -382,7 +405,7 @@ def detect_uniform_compliance(image):
         upper_half = image_array[:height//2, :, :]
         lower_half = image_array[height//2:, :, :]
         
-        # Check REQUIRED ITEMS (60% of total score)
+        # Check REQUIRED ITEMS (40% of total score - only 2 items now)
         
         # 1. Student ID Card (simulated - always present for now)
         compliance_score += 0.2
@@ -399,7 +422,7 @@ def detect_uniform_compliance(image):
         else:
             compliance_details.append("❌ Shirt not properly visible (Required)")
         
-        # 3. Trousers (lower part - dark colored)
+        # 3. Trousers (now OPTIONAL - moved to optional items)
         lower_hsv = cv2.cvtColor(lower_half, cv2.COLOR_RGB2HSV)
         lower_dark_mask = cv2.inRange(lower_hsv, dark_lower, dark_upper)
         lower_blue_mask = cv2.inRange(lower_hsv, blue_lower, blue_upper)
@@ -407,14 +430,18 @@ def detect_uniform_compliance(image):
         lower_blue_coverage = np.sum(lower_blue_mask > 0) / (lower_half.shape[0] * lower_half.shape[1])
         
         if lower_dark_coverage > 0.2 or lower_blue_coverage > 0.15:  # Dark or blue trousers
-            compliance_score += 0.2
-            compliance_details.append("✅ Trousers detected (Required)")
+            compliance_details.append("✅ Trousers detected (Optional)")
         else:
-            compliance_details.append("❌ Trousers not properly visible (Required)")
+            compliance_details.append("ℹ️ Trousers not visible (Optional)")
         
-        # Check OPTIONAL ITEMS (40% of total score)
+        # Check OPTIONAL ITEMS (60% of total score - now includes trousers)
         optional_score = 0.0
         optional_items = []
+        
+        # Trousers detection (now optional)
+        if lower_dark_coverage > 0.2 or lower_blue_coverage > 0.15:
+            optional_score += 0.15
+            optional_items.append("Trousers")
         
         # Optional items detection (simplified)
         # Tie detection (vertical lines in upper center)
@@ -463,8 +490,8 @@ def detect_uniform_compliance(image):
                 optional_score += 0.05
                 optional_items.append("Belt")
         
-        # Add optional items score (capped at 0.4)
-        optional_score = min(optional_score, 0.4)
+        # Add optional items score (capped at 0.6)
+        optional_score = min(optional_score, 0.6)
         compliance_score += optional_score
         
         # Add optional items details
@@ -473,8 +500,8 @@ def detect_uniform_compliance(image):
         else:
             compliance_details.append("ℹ️ No optional items detected")
         
-        # Final compliance assessment
-        if compliance_score >= 0.6:  # At least 60% (all required items)
+        # Final compliance assessment (now 40% for required items only)
+        if compliance_score >= 0.4:  # At least 40% (all required items: ID + Shirt)
             compliance_details.append("✅ UNIFORM COMPLIANCE: PASSED")
         else:
             compliance_details.append("❌ UNIFORM COMPLIANCE: FAILED")
@@ -1615,33 +1642,33 @@ def show_system_settings(students, mongo_connected):
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("**🔴 REQUIRED ITEMS (60% of score):**")
+            st.markdown("**🔴 REQUIRED ITEMS (40% of score):**")
             st.write("• Student ID Card")
             st.write("• Shirt (white/light colored)")
-            st.write("• Trousers (dark/blue colored)")
             
             st.markdown("**📊 Scoring:**")
             st.write("• Student ID: 20%")
             st.write("• Shirt: 20%")
-            st.write("• Trousers: 20%")
-            st.write("• **Total Required: 60%**")
+            st.write("• **Total Required: 40%**")
         
         with col2:
-            st.markdown("**🟡 OPTIONAL ITEMS (40% bonus):**")
+            st.markdown("**🟡 OPTIONAL ITEMS (60% bonus):**")
+            st.write("• Trousers (now optional)")
+            st.write("• Shoes")
+            st.write("• Belt")
+            st.write("• Socks")
             st.write("• Tie")
             st.write("• Blazer/Sweater")
             st.write("• Cap")
             st.write("• Badge")
-            st.write("• Shoes")
-            st.write("• Belt")
-            st.write("• Socks")
             
             st.markdown("**📊 Scoring:**")
-            st.write("• Each optional item: 5-10%")
-            st.write("• **Maximum Bonus: 40%**")
-            st.write("• **Passing Score: 60%**")
+            st.write("• Trousers: 15%")
+            st.write("• Other items: 5-10% each")
+            st.write("• **Maximum Bonus: 60%**")
+            st.write("• **Passing Score: 40%**")
         
-        st.success("💡 **Note:** Students must have ALL required items to pass. Optional items provide bonus points for better compliance.")
+        st.success("💡 **Note:** Students need only Student ID and Shirt to pass. All other items are optional bonus points.")
     
     with tab2:
         st.subheader("System Information")
@@ -1690,6 +1717,37 @@ def main():
         students = load_students(students_collection)
         st.metric("Total Students", len(students))
         
+        # Environment Selection
+        st.markdown("### 🌍 Environment")
+        env_config = load_environment_config()
+        available_envs = list(env_config.keys())
+        env_names = [env_config[env]["name"] for env in available_envs]
+        
+        selected_env_name = st.selectbox(
+            "Select Environment",
+            env_names,
+            index=0
+        )
+        
+        # Get selected environment
+        selected_env = None
+        for env_key, env_data in env_config.items():
+            if env_data["name"] == selected_env_name:
+                selected_env = env_key
+                break
+        
+        if selected_env:
+            env_data = env_config[selected_env]
+            st.info(f"**{env_data['name']}**")
+            st.caption(env_data.get('description', ''))
+            
+            # Show environment features
+            features = env_data.get('features', {})
+            if features.get('uniform_detection'):
+                st.success("✅ Uniform Detection Enabled")
+            else:
+                st.info("ℹ️ Face Recognition Only")
+        
         st.markdown("### 🧭 Navigation")
         page = st.selectbox(
             "Select Page",
@@ -1697,9 +1755,25 @@ def main():
         )
         
         st.markdown("### ⚙️ Detection Settings")
-        face_threshold = st.slider("Face Recognition Threshold", 0.3, 0.8, 0.6, 0.05)
-        uniform_threshold = st.slider("Uniform Compliance Threshold", 0.3, 0.9, 0.6, 0.05, 
-                                    help="60% = All required items (ID, Shirt, Trousers)")
+        
+        # Use environment-specific thresholds
+        if selected_env and env_data:
+            access_rules = env_data.get('access_rules', {})
+            default_face_threshold = access_rules.get('face_threshold', 0.6)
+            default_uniform_threshold = access_rules.get('uniform_threshold', 0.4)
+            
+            face_threshold = st.slider("Face Recognition Threshold", 0.3, 0.8, default_face_threshold, 0.05)
+            
+            if env_data.get('features', {}).get('uniform_detection', True):
+                uniform_threshold = st.slider("Uniform Compliance Threshold", 0.3, 0.9, default_uniform_threshold, 0.05, 
+                                            help="40% = Required items only (ID + Shirt)")
+            else:
+                uniform_threshold = 0.0
+                st.info("ℹ️ Uniform detection disabled for this environment")
+        else:
+            face_threshold = st.slider("Face Recognition Threshold", 0.3, 0.8, 0.6, 0.05)
+            uniform_threshold = st.slider("Uniform Compliance Threshold", 0.3, 0.9, 0.4, 0.05, 
+                                        help="40% = Required items only (ID + Shirt)")
         
         st.markdown("### 📋 Quick Actions")
         if st.button("🔄 Refresh System"):

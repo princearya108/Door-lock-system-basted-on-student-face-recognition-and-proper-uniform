@@ -28,15 +28,15 @@ class UniformRulesSetup:
             # आवश्यक items - ये सभी items होने जरूरी हैं
             "required_items": [
                 "student_id_card",  # Student ID Card - सबसे important
-                "shirt",            # School Shirt
-                "trousers",         # School Trousers/Pants
-                "shoes",            # School Shoes
-                "belt",             # Belt
-                "socks"             # Socks
+                "shirt"             # School Shirt
             ],
             
             # Optional items - ये हो सकते हैं या नहीं भी हो सकते
             "optional_items": [
+                "trousers",         # School Trousers/Pants (now optional)
+                "shoes",            # School Shoes
+                "belt",             # Belt
+                "socks",            # Socks
                 "tie",              # School Tie
                 "blazer",           # School Blazer/Jacket
                 "sweater",          # School Sweater
@@ -65,26 +65,26 @@ class UniformRulesSetup:
                     "pattern": ["solid"],
                     "fit_type": ["regular", "straight"],
                     "length": ["full_length"],
-                    "required": True
+                    "required": False
                 },
                 "shoes": {
                     "allowed_colors": ["black", "dark_brown"],
                     "type": ["formal_shoes", "school_shoes"],
                     "sole_color": ["black", "brown", "white"],
                     "laces": ["black", "brown", "white"],
-                    "required": True
+                    "required": False
                 },
                 "belt": {
                     "allowed_colors": ["black", "dark_brown"],
                     "material": ["leather", "synthetic"],
                     "buckle_color": ["silver", "gold", "black"],
-                    "required": True
+                    "required": False
                 },
                 "socks": {
                     "allowed_colors": ["white", "black", "dark_blue"],
                     "length": ["ankle", "crew", "knee_high"],
                     "pattern": ["solid"],
-                    "required": True
+                    "required": False
                 },
                 "tie": {
                     "allowed_colors": ["red", "blue", "green", "maroon"],
@@ -493,8 +493,8 @@ class UniformRulesSetup:
             
             print("\n📋 Summary:")
             print("✅ Uniform rules created with Indian school standards")
-            print("✅ Required items: Student ID, Shirt, Trousers, Shoes, Belt, Socks")
-            print("✅ Optional items: Tie, Blazer, Sweater, Cap, Badge")
+            print("✅ Required items: Student ID, Shirt (only 2 required items)")
+            print("✅ Optional items: Trousers, Shoes, Belt, Socks, Tie, Blazer, Sweater, Cap, Badge")
             print("✅ Color rules defined for each item")
             print("✅ Seasonal and special day rules included")
             print("✅ Training configuration prepared")

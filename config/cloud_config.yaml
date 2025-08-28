@@ -1,0 +1,65 @@
+models:
+  uniform_detection:
+    classes:
+    - student_id_card
+    - shirt
+    - trousers
+    - shoes
+    - belt
+    - socks
+    - tie
+    - blazer
+    - sweater
+    - cap
+    - badge
+    color_rules:
+      belt:
+      - black
+      - dark_brown
+      blazer:
+      - dark_blue
+      - black
+      - grey
+      shirt:
+      - white
+      - light_blue
+      - cream
+      shoes:
+      - black
+      - dark_brown
+      socks:
+      - white
+      - black
+      - dark_blue
+      student_id_card:
+      - white
+      - light_blue
+      - cream
+      tie:
+      - red
+      - blue
+      - green
+      - maroon
+      trousers:
+      - black
+      - dark_blue
+      - dark_grey
+      - khaki
+    confidence_threshold: 0.5
+    model_path: models/uniform_model/uniform_yolo.pt
+    model_type: yolo
+    nms_threshold: 0.4
+    optional_items:
+    - trousers
+    - shoes
+    - belt
+    - socks
+    - tie
+    - blazer
+    - sweater
+    - cap
+    - badge
+    required_items:
+    - student_id_card
+    - shirt
+    rules_file: config/uniform_rules.json

@@ -1,0 +1,13 @@
+{
+  "student_id_card": 0,
+  "shirt": 1,
+  "trousers": 2,
+  "shoes": 3,
+  "belt": 4,
+  "socks": 5,
+  "tie": 6,
+  "blazer": 7,
+  "sweater": 8,
+  "cap": 9,
+  "badge": 10
+}

@@ -1,16 +1,16 @@
 {
   "rule_name": "Standard School Uniform Rules",
   "version": "1.0",
-  "created_date": "2025-08-27T00:23:59.553158",
+  "created_date": "2025-08-29T02:05:22.054333",
   "required_items": [
     "student_id_card",
-    "shirt",
+    "shirt"
+  ],
+  "optional_items": [
     "trousers",
     "shoes",
     "belt",
-    "socks"
-  ],
-  "optional_items": [
+    "socks",
     "tie",
     "blazer",
     "sweater",
@@ -73,7 +73,7 @@
       "length": [
         "full_length"
       ],
-      "required": true
+      "required": false
     },
     "shoes": {
       "allowed_colors": [
@@ -94,7 +94,7 @@
         "brown",
         "white"
       ],
-      "required": true
+      "required": false
     },
     "belt": {
       "allowed_colors": [
@@ -110,7 +110,7 @@
         "gold",
         "black"
       ],
-      "required": true
+      "required": false
     },
     "socks": {
       "allowed_colors": [
@@ -126,7 +126,7 @@
       "pattern": [
         "solid"
       ],
-      "required": true
+      "required": false
     },
     "tie": {
       "allowed_colors": [
