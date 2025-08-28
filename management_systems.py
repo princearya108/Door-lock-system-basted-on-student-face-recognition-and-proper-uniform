@@ -7,7 +7,7 @@ Hotel, Office, Hospital, Factory management systems
 import streamlit as st
 import json
 import os
-from datetime import datetime
+from datetime import datetime, date
 from PIL import Image
 import pandas as pd
 from typing import Dict, List, Any
@@ -277,6 +277,7 @@ class EnvironmentManagement:
                     
                     # Pre-fill form with existing data
                     fields = env_config['fields']
+                    form_data = {}  # Initialize form_data dictionary
                     
                     with col1:
                         for i, (field_key, field_label) in enumerate(list(fields.items())[:4]):
@@ -453,8 +454,15 @@ class EnvironmentManagement:
                 'created_at': datetime.now().isoformat(),
                 'updated_at': datetime.now().isoformat(),
                 'image_path': image_path,
-                **form_data
             }
+            
+            # Add form data with proper date conversion
+            for key, value in form_data.items():
+                if isinstance(value, date):
+                    # Convert date to ISO string for MongoDB
+                    user_data[key] = value.isoformat()
+                else:
+                    user_data[key] = value
             
             if users_collection is not None:
                 # Save to MongoDB
@@ -485,8 +493,15 @@ class EnvironmentManagement:
         try:
             update_data = {
                 'updated_at': datetime.now().isoformat(),
-                **form_data
             }
+            
+            # Add form data with proper date conversion
+            for key, value in form_data.items():
+                if isinstance(value, date):
+                    # Convert date to ISO string for MongoDB
+                    update_data[key] = value.isoformat()
+                else:
+                    update_data[key] = value
             
             # Update photo if provided
             if photo:

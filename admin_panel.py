@@ -671,7 +671,7 @@ def show_dashboard(students, mongo_connected):
         else:
             st.info("No students registered yet")
 
-def show_student_management(students, students_collection):
+def show_student_management(users, users_collection):
     """Show student management interface"""
     st.header("👥 Student Management")
     
@@ -680,17 +680,17 @@ def show_student_management(students, students_collection):
     with tab1:
         st.subheader("Registered Students")
         
-        if students:
+        if users:
             # Search and filter
             col1, col2 = st.columns(2)
             with col1:
                 search_term = st.text_input("🔍 Search Students", placeholder="Name, Roll Number, or Course...")
             with col2:
                 course_filter = st.selectbox("📚 Filter by Course", 
-                                           ["All"] + list(set([s.get('course', 'Unknown') for s in students])))
+                                           ["All"] + list(set([s.get('course', 'Unknown') for s in users])))
             
             # Apply filters
-            filtered_students = students
+            filtered_students = users
             if search_term:
                 filtered_students = [s for s in filtered_students if 
                                    search_term.lower() in s.get('name', '').lower() or 
@@ -762,7 +762,7 @@ def show_student_management(students, students_collection):
                             with col_confirm1:
                                 if st.button("🚨 PERMANENTLY DELETE", type="primary", key=f"final_delete_{quick_delete_roll}"):
                                     try:
-                                        success = delete_student(students_collection, quick_delete_roll)
+                                        success = delete_student(users_collection, quick_delete_roll)
                                         if success:
                                             st.success("✅ Student permanently deleted!")
                                             st.balloons()
@@ -857,7 +857,7 @@ def show_student_management(students, students_collection):
                             new_status = 'Inactive' if current_status == 'Active' else 'Active'
                             
                             if st.button(f"🔄 Toggle Status to {new_status}"):
-                                success = update_student_status(students_collection, selected_student_roll, new_status)
+                                success = update_student_status(users_collection, selected_student_roll, new_status)
                                 if success:
                                     st.success(f"✅ Status updated to {new_status}!")
                                     st.rerun()
@@ -917,7 +917,7 @@ def show_student_management(students, students_collection):
             if submitted:
                 if all([roll_number, name, course, branch, section]):
                     # Check if roll number already exists
-                    if any(s.get('roll_number') == roll_number for s in students):
+                    if any(s.get('roll_number') == roll_number for s in users):
                         st.error("❌ Roll number already exists!")
                     else:
                         # Create student data
@@ -929,7 +929,8 @@ def show_student_management(students, students_collection):
                             'section': section,
                             'status': status,
                             'added_date': datetime.now().isoformat(),
-                            'image_path': None
+                            'image_path': None,
+                            'environment': 'school_college'  # Add environment for school/college
                         }
                         
                         # Process and save image if uploaded
@@ -945,7 +946,7 @@ def show_student_management(students, students_collection):
                                 st.warning(f"⚠️ Image upload failed: {e}")
                         
                         # Save student
-                        success, message = save_student(students_collection, student_data)
+                        success, message = save_student(users_collection, student_data)
                         if success:
                             st.success(f"✅ {message}")
                             st.balloons()
@@ -958,18 +959,18 @@ def show_student_management(students, students_collection):
     with tab3:
         st.subheader("✏️ Edit Student Details")
         
-        if not students:
+        if not users:
             st.info("📝 No students available to edit. Add some students first!")
         else:
             # Select student to edit
             edit_student_roll = st.selectbox(
                 "Select Student to Edit",
-                [s.get('roll_number') for s in students],
-                format_func=lambda x: f"{x} - {next((s.get('name') for s in students if s.get('roll_number') == x), 'Unknown')}"
+                [s.get('roll_number') for s in users],
+                format_func=lambda x: f"{x} - {next((s.get('name') for s in users if s.get('roll_number') == x), 'Unknown')}"
             )
             
             if edit_student_roll:
-                edit_student = next((s for s in students if s.get('roll_number') == edit_student_roll), None)
+                edit_student = next((s for s in users if s.get('roll_number') == edit_student_roll), None)
                 
                 if edit_student:
                     st.info(f"**Editing:** {edit_student.get('name')} ({edit_student.get('roll_number')})")
@@ -1041,7 +1042,7 @@ def show_student_management(students, students_collection):
                                             st.warning(f"⚠️ New photo upload failed: {e}")
                                     
                                     # Update student
-                                    success, message = save_student(students_collection, updated_student)
+                                    success, message = save_student(users_collection, updated_student)
                                     if success:
                                         st.success(f"✅ {message}")
                                         st.balloons()
@@ -1864,6 +1865,27 @@ def main():
         else:
             st.warning("**💾 Local Storage Mode**")
         
+        # Environment Selection (must be first)
+        st.markdown("### 🌍 Environment")
+        env_config = load_environment_config()
+        available_envs = list(env_config.keys())
+        env_names = [env_config[env]["name"] for env in available_envs]
+        
+        selected_env_name = st.selectbox(
+            "Select Environment",
+            env_names,
+            index=0
+        )
+        
+        # Get selected environment
+        selected_env = None
+        env_data = None
+        for env_key, env_info in env_config.items():
+            if env_info["name"] == selected_env_name:
+                selected_env = env_key
+                env_data = env_info
+                break
+        
         # Get environment-specific collections
         if mongo_connected and selected_env:
             users_collection, logs_collection = get_environment_collections(db, selected_env)
@@ -1879,27 +1901,7 @@ def main():
             users = []
             st.metric("Total Users", 0)
         
-        # Environment Selection
-        st.markdown("### 🌍 Environment")
-        env_config = load_environment_config()
-        available_envs = list(env_config.keys())
-        env_names = [env_config[env]["name"] for env in available_envs]
-        
-        selected_env_name = st.selectbox(
-            "Select Environment",
-            env_names,
-            index=0
-        )
-        
-        # Get selected environment
-        selected_env = None
-        for env_key, env_data in env_config.items():
-            if env_data["name"] == selected_env_name:
-                selected_env = env_key
-                break
-        
         if selected_env:
-            env_data = env_config[selected_env]
             st.info(f"**{env_data['name']}**")
             st.caption(env_data.get('description', ''))
             
