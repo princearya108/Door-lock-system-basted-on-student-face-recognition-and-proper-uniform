@@ -65,9 +65,39 @@ ENCODED_PASSWORD = quote_plus(PASSWORD)
 MONGODB_URI = f"mongodb+srv://{ENCODED_USERNAME}:{ENCODED_PASSWORD}@{CLUSTER}/"
 
 DATABASE_NAME = "doorlock_system"
-COLLECTION_STUDENTS = "students"
-COLLECTION_LOGS = "access_logs"
-COLLECTION_UNIFORM_RULES = "uniform_rules"
+
+# Load database collections configuration
+def load_database_collections():
+    """Load database collections configuration"""
+    try:
+        with open('config/database_collections.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        # Default collections if file not found
+        return {
+            "collections": {
+                "school_college": {
+                    "users_collection": "school_students",
+                    "logs_collection": "school_access_logs"
+                },
+                "hotel": {
+                    "users_collection": "hotel_guests",
+                    "logs_collection": "hotel_access_logs"
+                },
+                "office": {
+                    "users_collection": "office_employees",
+                    "logs_collection": "office_access_logs"
+                },
+                "hospital": {
+                    "users_collection": "hospital_staff",
+                    "logs_collection": "hospital_access_logs"
+                },
+                "factory": {
+                    "users_collection": "factory_workers",
+                    "logs_collection": "factory_access_logs"
+                }
+            }
+        }
 
 # Data storage paths (fallback)
 DATA_DIR = "data"
@@ -82,14 +112,42 @@ def connect_mongodb():
         client.admin.command('ping')
         
         db = client[DATABASE_NAME]
-        students_collection = db[COLLECTION_STUDENTS]
-        logs_collection = db[COLLECTION_LOGS]
-        rules_collection = db[COLLECTION_UNIFORM_RULES]
         
-        return True, client, db, students_collection, logs_collection, rules_collection
+        return True, client, db
     except Exception as e:
         st.error(f"❌ MongoDB connection failed: {e}")
-        return False, None, None, None, None, None
+        return False, None, None
+
+def get_environment_collections(db, environment: str):
+    """Get collections for specific environment"""
+    collections_config = load_database_collections()
+    env_collections = collections_config["collections"].get(environment, {
+        "users_collection": "default_users",
+        "logs_collection": "default_logs"
+    })
+    
+    users_collection = db[env_collections["users_collection"]]
+    logs_collection = db[env_collections["logs_collection"]]
+    
+    return users_collection, logs_collection
+
+def load_environment_users(users_collection, environment: str):
+    """Load users for specific environment"""
+    try:
+        if users_collection is not None:
+            # Load from MongoDB
+            users = list(users_collection.find({"environment": environment}))
+            return users
+        else:
+            # Load from local JSON
+            data_file = f"data/{environment}_users.json"
+            if os.path.exists(data_file):
+                with open(data_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            return []
+    except Exception as e:
+        st.error(f"Error loading users: {e}")
+        return []
 
 def ensure_directories():
     """Ensure all required directories exist"""
@@ -354,6 +412,58 @@ def recognize_face(image, students):
         
     except Exception as e:
         st.error(f"Face recognition error: {e}")
+        return None, 0.0
+
+def recognize_face_fast(image, users, environment: str = None):
+    """Fast face recognition using environment-specific collections"""
+    try:
+        # Handle different image input types
+        if hasattr(image, 'read'):  # Streamlit camera input
+            pil_image = Image.open(image)
+            image_array = np.array(pil_image)
+        elif isinstance(image, Image.Image):  # PIL Image
+            image_array = np.array(image)
+        else:  # Already numpy array
+            image_array = np.array(image)
+        
+        # Get face encodings
+        face_encodings = face_recognition.face_encodings(image_array)
+        
+        if not face_encodings:
+            return None, 0.0
+        
+        face_encoding = face_encodings[0]
+        best_match = None
+        best_distance = 1.0
+        
+        # Filter users by environment for faster processing
+        if environment:
+            env_users = [user for user in users if user.get('environment') == environment]
+        else:
+            env_users = users
+        
+        # Compare with stored faces (only from current environment)
+        for user in env_users:
+            if user.get('image_path') and os.path.exists(user['image_path']):
+                try:
+                    stored_image = face_recognition.load_image_file(user['image_path'])
+                    stored_encodings = face_recognition.face_encodings(stored_image)
+                    
+                    if stored_encodings:
+                        stored_encoding = stored_encodings[0]
+                        distance = face_recognition.face_distance([stored_encoding], face_encoding)[0]
+                        
+                        if distance < best_distance and distance < 0.6:
+                            best_distance = distance
+                            best_match = user
+                except Exception:
+                    continue
+        
+        confidence = 1.0 - best_distance if best_match else 0.0
+        return best_match, confidence
+        
+    except Exception as e:
+        st.error(f"Fast face recognition error: {e}")
         return None, 0.0
 
 def detect_uniform_compliance(image):
@@ -1033,8 +1143,8 @@ def process_detection(image, students, face_threshold, uniform_threshold, logs_c
             image_with_faces_rgb = cv2.cvtColor(image_with_faces, cv2.COLOR_BGR2RGB)
             st.image(image_with_faces_rgb, caption="Image with Detected Faces", width=400)
             
-            # Face recognition
-            recognized_student, confidence = recognize_face(image, students)
+            # Face recognition (fast version with environment filtering)
+            recognized_student, confidence = recognize_face_fast(image, students, selected_env)
             
             if recognized_student and confidence >= face_threshold:
                 st.success(f"✅ Face Recognized: {recognized_student['name']}")
@@ -1735,7 +1845,7 @@ def main():
     ensure_directories()
     
     # Connect to MongoDB
-    mongo_connected, client, db, students_collection, logs_collection, rules_collection = connect_mongodb()
+    mongo_connected, client, db = connect_mongodb()
     
     # Header
     st.markdown("""
@@ -1754,9 +1864,20 @@ def main():
         else:
             st.warning("**💾 Local Storage Mode**")
         
-        # Load students
-        students = load_students(students_collection)
-        st.metric("Total Students", len(students))
+        # Get environment-specific collections
+        if mongo_connected and selected_env:
+            users_collection, logs_collection = get_environment_collections(db, selected_env)
+        else:
+            users_collection, logs_collection = None, None
+        
+        # Load users for current environment
+        if selected_env:
+            users = load_environment_users(users_collection, selected_env)
+            env_name = env_data.get('name', selected_env)
+            st.metric(f"Total {env_name.split()[0]}s", len(users))
+        else:
+            users = []
+            st.metric("Total Users", 0)
         
         # Environment Selection
         st.markdown("### 🌍 Environment")
@@ -1790,10 +1911,22 @@ def main():
                 st.info("ℹ️ Face Recognition Only")
         
         st.markdown("### 🧭 Navigation")
-        page = st.selectbox(
-            "Select Page",
-            ["🏠 Dashboard", "👥 Student Management", "🔍 PC Camera Testing", "🚪 Access Control", "📈 Analytics", "⚙️ System Settings"]
-        )
+        
+        # Dynamic navigation based on environment
+        if selected_env == "school_college":
+            pages = ["🏠 Dashboard", "👥 Student Management", "🔍 PC Camera Testing", "🚪 Access Control", "📈 Analytics", "⚙️ System Settings"]
+        elif selected_env == "hotel":
+            pages = ["🏠 Dashboard", "🏨 Hotel Management", "🔍 PC Camera Testing", "🚪 Access Control", "📈 Analytics", "⚙️ System Settings"]
+        elif selected_env == "office":
+            pages = ["🏠 Dashboard", "🏢 Office Management", "🔍 PC Camera Testing", "🚪 Access Control", "📈 Analytics", "⚙️ System Settings"]
+        elif selected_env == "hospital":
+            pages = ["🏠 Dashboard", "🏥 Hospital Management", "🔍 PC Camera Testing", "🚪 Access Control", "📈 Analytics", "⚙️ System Settings"]
+        elif selected_env == "factory":
+            pages = ["🏠 Dashboard", "🏭 Factory Management", "🔍 PC Camera Testing", "🚪 Access Control", "📈 Analytics", "⚙️ System Settings"]
+        else:
+            pages = ["🏠 Dashboard", "👥 User Management", "🔍 PC Camera Testing", "🚪 Access Control", "📈 Analytics", "⚙️ System Settings"]
+        
+        page = st.selectbox("Select Page", pages)
         
         st.markdown("### ⚙️ Detection Settings")
         
@@ -1822,17 +1955,31 @@ def main():
     
     # Main content based on selected page
     if page == "🏠 Dashboard":
-        show_dashboard(students, mongo_connected)
+        show_dashboard(users, mongo_connected)
     elif page == "👥 Student Management":
-        show_student_management(students, students_collection)
+        show_student_management(users, users_collection)
+    elif page == "🏨 Hotel Management":
+        from management_systems import env_management
+        env_management.show_environment_management("hotel", users_collection, logs_collection)
+    elif page == "🏢 Office Management":
+        from management_systems import env_management
+        env_management.show_environment_management("office", users_collection, logs_collection)
+    elif page == "🏥 Hospital Management":
+        from management_systems import env_management
+        env_management.show_environment_management("hospital", users_collection, logs_collection)
+    elif page == "🏭 Factory Management":
+        from management_systems import env_management
+        env_management.show_environment_management("factory", users_collection, logs_collection)
+    elif page == "👥 User Management":
+        show_student_management(users, users_collection)
     elif page == "🔍 PC Camera Testing":
-        show_pc_camera_testing(students, face_threshold, uniform_threshold, logs_collection, selected_env)
+        show_pc_camera_testing(users, face_threshold, uniform_threshold, logs_collection, selected_env)
     elif page == "🚪 Access Control":
         show_access_control(logs_collection)
     elif page == "📈 Analytics":
-        show_analytics(students, logs_collection)
+        show_analytics(users, logs_collection)
     elif page == "⚙️ System Settings":
-        show_system_settings(students, mongo_connected)
+        show_system_settings(users, mongo_connected)
 
 if __name__ == "__main__":
     main()

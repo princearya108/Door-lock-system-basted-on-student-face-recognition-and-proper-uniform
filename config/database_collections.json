@@ -1,0 +1,78 @@
+{
+  "database_name": "doorlock_system",
+  "collections": {
+    "school_college": {
+      "users_collection": "school_students",
+      "logs_collection": "school_access_logs",
+      "uniform_rules_collection": "school_uniform_rules",
+      "analytics_collection": "school_analytics",
+      "description": "Educational institution data"
+    },
+    "hotel": {
+      "users_collection": "hotel_guests",
+      "logs_collection": "hotel_access_logs",
+      "uniform_rules_collection": "hotel_rules",
+      "analytics_collection": "hotel_analytics",
+      "description": "Hotel guest and staff data"
+    },
+    "office": {
+      "users_collection": "office_employees",
+      "logs_collection": "office_access_logs",
+      "uniform_rules_collection": "office_rules",
+      "analytics_collection": "office_analytics",
+      "description": "Corporate office employee data"
+    },
+    "hospital": {
+      "users_collection": "hospital_staff",
+      "logs_collection": "hospital_access_logs",
+      "uniform_rules_collection": "hospital_uniform_rules",
+      "analytics_collection": "hospital_analytics",
+      "description": "Medical facility staff data"
+    },
+    "factory": {
+      "users_collection": "factory_workers",
+      "logs_collection": "factory_access_logs",
+      "uniform_rules_collection": "factory_safety_rules",
+      "analytics_collection": "factory_analytics",
+      "description": "Industrial facility worker data"
+    }
+  },
+  "performance": {
+    "face_recognition_optimization": {
+      "enabled": true,
+      "environment_specific_collections": true,
+      "face_encoding_cache": true,
+      "batch_processing": true
+    },
+    "indexes": {
+      "face_encodings": true,
+      "user_id": true,
+      "timestamp": true,
+      "environment": true
+    }
+  },
+  "schemas": {
+    "user_schema": {
+      "user_id": "string",
+      "name": "string",
+      "face_encoding": "array",
+      "environment": "string",
+      "user_type": "string",
+      "status": "string",
+      "created_at": "datetime",
+      "updated_at": "datetime",
+      "metadata": "object"
+    },
+    "log_schema": {
+      "log_id": "string",
+      "user_id": "string",
+      "environment": "string",
+      "access_granted": "boolean",
+      "face_confidence": "float",
+      "uniform_compliance": "float",
+      "timestamp": "datetime",
+      "device_id": "string",
+      "denial_reason": "string"
+    }
+  }
+}
