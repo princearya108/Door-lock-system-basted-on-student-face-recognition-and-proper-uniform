@@ -945,9 +945,24 @@ def show_student_management(students, students_collection):
                             if st.form_submit_button("❌ Cancel", type="secondary"):
                                 st.rerun()
 
-def show_pc_camera_testing(students, face_threshold, uniform_threshold, logs_collection):
+def show_pc_camera_testing(students, face_threshold, uniform_threshold, logs_collection, selected_env=None):
     """Show PC camera testing interface"""
     st.header("🔍 PC Camera Testing & Detection")
+    
+    # Show current environment
+    if selected_env:
+        env_config = load_environment_config()
+        env_data = env_config.get(selected_env, {})
+        env_name = env_data.get('name', selected_env)
+        
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.info(f"🌍 **Current Environment:** {env_name}")
+        with col2:
+            if env_data.get('features', {}).get('uniform_detection', True):
+                st.success("✅ Uniform Detection: Enabled")
+            else:
+                st.info("ℹ️ Uniform Detection: Disabled (Face Recognition Only)")
     
     # Camera options
     camera_source = st.selectbox("📸 Camera Source", ["Webcam", "Upload Image"])
@@ -959,7 +974,7 @@ def show_pc_camera_testing(students, face_threshold, uniform_threshold, logs_col
         camera_input = st.camera_input("Take a photo for detection")
         
         if camera_input is not None:
-            process_detection(camera_input, students, face_threshold, uniform_threshold, logs_collection)
+            process_detection(camera_input, students, face_threshold, uniform_threshold, logs_collection, selected_env)
     
     else:
         st.subheader("📁 Upload Image for Detection")
@@ -975,15 +990,30 @@ def show_pc_camera_testing(students, face_threshold, uniform_threshold, logs_col
             st.image(image, caption="Uploaded Image", width=400)
             
             if st.button("🔍 Analyze Image"):
-                process_detection(image, students, face_threshold, uniform_threshold, logs_collection)
+                process_detection(image, students, face_threshold, uniform_threshold, logs_collection, selected_env)
 
-def process_detection(image, students, face_threshold, uniform_threshold, logs_collection):
+def process_detection(image, students, face_threshold, uniform_threshold, logs_collection, selected_env=None):
     """Process the detection and show results"""
     
     st.header("🔍 Detection Results")
     
+    # Load environment configuration
+    env_config = load_environment_config()
+    env_data = None
+    if selected_env:
+        env_data = env_config.get(selected_env, {})
+    
+    # Check if uniform detection is enabled for this environment
+    uniform_detection_enabled = True
+    if env_data and not env_data.get('features', {}).get('uniform_detection', True):
+        uniform_detection_enabled = False
+    
     # Create columns for results
-    col1, col2 = st.columns(2)
+    if uniform_detection_enabled:
+        col1, col2 = st.columns(2)
+    else:
+        col1 = st.container()
+        col2 = None
     
     with col1:
         st.subheader("📸 Face Detection")
@@ -1018,26 +1048,32 @@ def process_detection(image, students, face_threshold, uniform_threshold, logs_c
             st.error("❌ No faces detected in image")
             return
     
-    with col2:
-        st.subheader("👔 Uniform Detection")
-        
-        # Uniform compliance check
-        compliance_score, compliance_details = detect_uniform_compliance(image)
-        
-        # Display compliance details
-        for detail in compliance_details:
-            if "✅" in detail:
-                st.success(detail)
+    # Uniform detection (only if enabled for this environment)
+    if uniform_detection_enabled and col2:
+        with col2:
+            st.subheader("👔 Uniform Detection")
+            
+            # Uniform compliance check
+            compliance_score, compliance_details = detect_uniform_compliance(image)
+            
+            # Display compliance details
+            for detail in compliance_details:
+                if "✅" in detail:
+                    st.success(detail)
+                else:
+                    st.error(detail)
+            
+            st.metric("Uniform Compliance Score", f"{compliance_score:.1%}")
+            
+            # Overall assessment
+            if compliance_score >= uniform_threshold:
+                st.success("✅ Uniform Compliance: PASSED")
             else:
-                st.error(detail)
-        
-        st.metric("Uniform Compliance Score", f"{compliance_score:.1%}")
-        
-        # Overall assessment
-        if compliance_score >= uniform_threshold:
-            st.success("✅ Uniform Compliance: PASSED")
-        else:
-            st.error("❌ Uniform Compliance: FAILED")
+                st.error("❌ Uniform Compliance: FAILED")
+    else:
+        # No uniform detection for this environment
+        compliance_score = 1.0  # Always pass uniform check
+        compliance_details = ["ℹ️ Uniform detection disabled for this environment"]
     
     # Access decision
     st.divider()
@@ -1045,7 +1081,12 @@ def process_detection(image, students, face_threshold, uniform_threshold, logs_c
     
     if len(faces) > 0:
         face_recognized = recognized_student and confidence >= face_threshold
-        uniform_compliant = compliance_score >= uniform_threshold
+        
+        # For environments without uniform detection, always consider uniform compliant
+        if uniform_detection_enabled:
+            uniform_compliant = compliance_score >= uniform_threshold
+        else:
+            uniform_compliant = True  # Always pass for face-only environments
         
         if face_recognized and uniform_compliant:
             st.success("🎉 ACCESS GRANTED!")
@@ -1785,7 +1826,7 @@ def main():
     elif page == "👥 Student Management":
         show_student_management(students, students_collection)
     elif page == "🔍 PC Camera Testing":
-        show_pc_camera_testing(students, face_threshold, uniform_threshold, logs_collection)
+        show_pc_camera_testing(students, face_threshold, uniform_threshold, logs_collection, selected_env)
     elif page == "🚪 Access Control":
         show_access_control(logs_collection)
     elif page == "📈 Analytics":
